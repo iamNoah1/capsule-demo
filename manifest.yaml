@@ -1,0 +1,39 @@
+apiVersion: capsule.clastix.io/v1beta1
+kind: Tenant
+metadata:
+  name: jesters
+  annotations:
+    clusterrolenames.capsule.clastix.io/user.noah: manager
+spec:
+  owners: # Users of the K8s Cluster. Org of login cert has to be the same as capsule user group 
+  - name: noah
+    kind: User
+  namespaceOptions:
+    quota: 1
+  resourceQuotas:
+    scope: Tenant #Enforcement also possible at namespace level
+    items:
+    - hard:
+        limits.cpu: "2"
+        limits.memory: 2Gi
+        requests.cpu: "2"
+        requests.memory: 2Gi
+    - hard:
+        pods: "3"
+  limitRanges:
+    items:
+    - limits:
+      - default:
+          cpu: 200m
+          memory: 512Mi
+        type: Container
+  ingressOptions:
+    allowedHostnames:
+      allowed:
+        - api.jesters.com
+      allowedRegex: ^.*jesters.com$
+  imagePullPolicies:
+  - Always
+  serviceOptions:
+    allowedServices:
+      loadBalancer: false
